@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>썸네일 메이커</title>
+<style>
+:root {
+  --bg: #0a0a0a; --surface: #141414; --surface2: #1e1e1e;
+  --border: #2a2a2a; --accent: #ff3c3c; --accent2: #ff6b35;
+  --text: #f0f0f0; --muted: #888; --radius: 14px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+html, body { background: var(--bg); color: var(--text); font-family: 'Apple SD Gothic Neo','Noto Sans KR',sans-serif; }
+body { padding: 0 0 80px; }
+
+.header { padding: 24px 20px 0; display: flex; align-items: center; justify-content: space-between; }
+.logo { font-size: 20px; font-weight: 800; }
+.logo span { color: var(--accent); }
+.badge { font-size: 11px; background: #1a1a1a; border: 1px solid var(--border); padding: 5px 12px; border-radius: 20px; color: var(--muted); }
+
+.section { padding: 20px 20px 0; }
+.section-label { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; color: var(--muted); text-transform: uppercase; margin-bottom: 12px; }
+
+.platform-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+.platform-btn { background: var(--surface); border: 2px solid var(--border); border-radius: 14px; padding: 16px 8px; cursor: pointer; text-align: center; min-height: 80px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; -webkit-appearance: none; }
+.platform-btn.active { border-color: var(--accent); background: rgba(255,60,60,0.1); }
+.platform-btn .icon { font-size: 24px; }
+.platform-btn .name { font-size: 12px; color: var(--muted); font-weight: 600; }
+.platform-btn.active .name { color: var(--accent); }
+
+.upload-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.upload-col-label { font-size: 11px; color: #555; margin-bottom: 6px; }
+.upload-box { background: var(--surface); border: 2px dashed var(--border); border-radius: var(--radius); min-height: 130px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; position: relative; overflow: hidden; -webkit-appearance: none; }
+.upload-box.filled { border-style: solid; border-color: #333; }
+.upload-box img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 12px; }
+.upload-icon { font-size: 30px; position: relative; z-index: 1; }
+.upload-label { font-size: 12px; color: var(--muted); text-align: center; line-height: 1.5; position: relative; z-index: 1; }
+.upload-sublabel { font-size: 10px; color: #555; position: relative; z-index: 1; }
+.count-badge { position: absolute; top: 8px; right: 8px; z-index: 2; background: var(--accent); color: #fff; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 10px; }
+input[type=file] { display: none; }
+
+/* Size controls */
+.size-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+.size-preset { background: var(--surface); border: 2px solid var(--border); border-radius: 12px; padding: 12px; cursor: pointer; text-align: center; -webkit-appearance: none; min-height: 56px; }
+.size-preset.active { border-color: #64a0ff; background: rgba(100,160,255,0.1); }
+.size-preset .sname { font-size: 12px; font-weight: 600; color: var(--muted); }
+.size-preset.active .sname { color: #7ab4ff; }
+.size-preset .sdim { font-size: 10px; color: #555; margin-top: 3px; }
+.size-custom-row { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
+.size-input { flex: 1; background: var(--surface); border: 2px solid var(--border); border-radius: 10px; padding: 12px; color: var(--text); font-size: 15px; font-family: inherit; outline: none; -webkit-appearance: none; text-align: center; }
+.size-x { color: var(--muted); font-size: 16px; font-weight: 700; }
+.size-unit { font-size: 12px; color: #555; margin-left: 4px; }
+.size-orientation { display: flex; gap: 8px; margin-top: 10px; }
+.orient-btn { flex: 1; background: var(--surface); border: 2px solid var(--border); border-radius: 10px; padding: 12px; cursor: pointer; text-align: center; font-size: 13px; color: var(--muted); font-weight: 600; -webkit-appearance: none; min-height: 48px; }
+.orient-btn.active { border-color: #64dc96; background: rgba(100,220,150,0.1); color: #64dc96; }
+
+.input-wrap { position: relative; }
+.text-input, .textarea-input { width: 100%; background: var(--surface); border: 2px solid var(--border); border-radius: 12px; padding: 14px 16px; color: var(--text); font-size: 15px; font-family: inherit; outline: none; -webkit-appearance: none; }
+.text-input { padding-right: 48px; }
+.textarea-input { resize: none; min-height: 88px; line-height: 1.6; }
+.text-input::placeholder, .textarea-input::placeholder { color: #555; }
+.eye-btn { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--muted); font-size: 20px; padding: 8px; min-width: 44px; min-height: 44px; display: flex; align-items: center; justify-content: center; }
+.api-hint { font-size: 11px; color: #555; margin-top: 8px; line-height: 1.6; }
+.api-hint a { color: #777; text-decoration: underline; }
+.key-saved { font-size: 11px; color: #64dc96; margin-top: 6px; }
+
+.pills-wrap { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; margin-top: 10px; scrollbar-width: none; }
+.pills-wrap::-webkit-scrollbar { display: none; }
+.pill { flex-shrink: 0; background: var(--surface); border: 1.5px solid var(--border); border-radius: 20px; padding: 8px 14px; font-size: 12px; color: var(--muted); cursor: pointer; white-space: nowrap; -webkit-appearance: none; min-height: 36px; display: flex; align-items: center; }
+
+.analyze-btn { width: 100%; padding: 18px; background: linear-gradient(135deg, var(--accent), var(--accent2)); border: none; border-radius: 16px; color: #fff; font-size: 17px; font-weight: 800; cursor: pointer; -webkit-appearance: none; min-height: 56px; }
+.analyze-btn:disabled { opacity: 0.4; }
+
+/* Status box - always visible */
+.status-box { background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; font-size: 13px; color: var(--muted); line-height: 1.6; min-height: 48px; }
+.status-box.error { border-color: #ff3c3c; color: #ff8888; background: rgba(255,60,60,0.08); }
+.status-box.success { border-color: #64dc96; color: #64dc96; background: rgba(100,220,150,0.08); }
+.status-box.loading { color: #aaa; }
+
+.spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid #444; border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; margin-right: 8px; vertical-align: middle; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.result-card { display: none; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+.result-card.show { display: block; }
+.result-header { padding: 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
+.result-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+.result-title-text { font-size: 13px; font-weight: 600; color: var(--muted); }
+.result-body { padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+.strategy-item { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 14px; }
+.stag { display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; padding: 3px 9px; border-radius: 6px; margin-bottom: 8px; }
+.stag-red { background: rgba(255,60,60,0.15); color: #ff6666; }
+.stag-orange { background: rgba(255,107,53,0.15); color: #ff8c5a; }
+.stag-blue { background: rgba(100,160,255,0.15); color: #7ab4ff; }
+.stag-green { background: rgba(100,220,150,0.15); color: #64dc96; }
+.stag-purple { background: rgba(180,100,255,0.15); color: #c87aff; }
+.scontent { font-size: 14px; color: #ccc; line-height: 1.7; }
+
+.edit-section { display: none; }
+.edit-section.show { display: block; }
+.edit-row { display: flex; gap: 8px; }
+.edit-input { flex: 1; background: var(--surface); border: 2px solid var(--border); border-radius: 12px; padding: 13px 16px; color: var(--text); font-size: 15px; font-family: inherit; outline: none; -webkit-appearance: none; min-height: 50px; }
+.edit-input::placeholder { color: #555; }
+.edit-send-btn { background: var(--surface2); border: 2px solid var(--border); border-radius: 12px; color: var(--text); cursor: pointer; font-size: 20px; -webkit-appearance: none; min-width: 54px; min-height: 50px; display: flex; align-items: center; justify-content: center; }
+
+.canva-section { display: none; }
+.canva-section.show { display: block; }
+.canva-open-btn { width: 100%; padding: 17px; background: #7c4dff; border: none; border-radius: 16px; color: #fff; font-size: 16px; font-weight: 800; cursor: pointer; -webkit-appearance: none; min-height: 54px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+.canva-hint { font-size: 11px; color: #555; text-align: center; margin-top: 8px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">THUMB<span>AI</span></div>
+  <div class="badge">나만의 썸네일 메이커</div>
+</div>
+
+<!-- Platform -->
+<div class="section">
+  <div class="section-label">플랫폼 선택</div>
+  <div class="platform-grid">
+    <button class="platform-btn active" id="plt-youtube" type="button">
+      <span class="icon">▶️</span><span class="name">YouTube</span>
+    </button>
+    <button class="platform-btn" id="plt-xiaohongshu" type="button">
+      <span class="icon">📕</span><span class="name">샤오홍슈</span>
+    </button>
+    <button class="platform-btn" id="plt-instagram" type="button">
+      <span class="icon">📸</span><span class="name">Instagram</span>
+    </button>
+  </div>
+</div>
+
+<!-- Upload -->
+<div class="section">
+  <div class="section-label">사진 업로드</div>
+  <div class="upload-grid">
+    <div>
+      <div class="upload-col-label">참고 썸네일 (최대 3장)</div>
+      <div class="upload-box" id="ref-box" role="button" tabindex="0">
+        <span class="upload-icon">🖼</span>
+        <div class="upload-label">인기 썸네일<br>레퍼런스</div>
+        <div class="upload-sublabel">분석할 예시</div>
+      </div>
+      <input type="file" id="ref-input" multiple accept="image/*">
+    </div>
+    <div>
+      <div class="upload-col-label">내 영상 캡처 (최대 5장)</div>
+      <div class="upload-box" id="my-box" role="button" tabindex="0">
+        <span class="upload-icon">📷</span>
+        <div class="upload-label">내 영상에서<br>캡처한 사진</div>
+        <div class="upload-sublabel">썸네일 후보</div>
+      </div>
+      <input type="file" id="my-input" multiple accept="image/*">
+    </div>
+  </div>
+</div>
+
+<!-- Size -->
+<div class="section">
+  <div class="section-label">출력 사이즈</div>
+  <div class="size-grid">
+    <button class="size-preset active" id="sz-yt" type="button">
+      <div class="sname">YouTube</div><div class="sdim">1280 × 720</div>
+    </button>
+    <button class="size-preset" id="sz-xhs" type="button">
+      <div class="sname">샤오홍슈</div><div class="sdim">1080 × 1440</div>
+    </button>
+    <button class="size-preset" id="sz-ig" type="button">
+      <div class="sname">Instagram</div><div class="sdim">1080 × 1080</div>
+    </button>
+    <button class="size-preset" id="sz-st" type="button">
+      <div class="sname">스토리/릴스</div><div class="sdim">1080 × 1920</div>
+    </button>
+  </div>
+  <div class="size-custom-row">
+    <input type="number" class="size-input" id="size-w" value="1280" placeholder="가로">
+    <span class="size-x">×</span>
+    <input type="number" class="size-input" id="size-h" value="720" placeholder="세로">
+    <span class="size-unit">px</span>
+  </div>
+  <div class="size-orientation">
+    <button class="orient-btn active" id="orient-land" type="button">🖥 가로형</button>
+    <button class="orient-btn" id="orient-port" type="button">📱 세로형</button>
+  </div>
+</div>
+
+<!-- API Key -->
+<div class="section">
+  <div class="section-label">ChatGPT API 키</div>
+  <div class="input-wrap">
+    <input type="password" class="text-input" id="api-key" placeholder="sk-..." autocomplete="off">
+    <button class="eye-btn" id="eye-btn" type="button">👁</button>
+  </div>
+  <div id="key-status"></div>
+  <div class="api-hint">
+    🔑 <a href="https://platform.openai.com/api-keys" target="_blank">platform.openai.com</a> → API keys → Create key<br>
+    키는 이 기기에만 저장돼요
+  </div>
+</div>
+
+<!-- Prompt -->
+<div class="section">
+  <div class="section-label">추가 요청 (선택)</div>
+  <textarea class="textarea-input" id="user-prompt" placeholder="예: 음식 먹방, 밝고 식욕 자극&#10;예: 감성 여행 vlog, 영화같은 느낌"></textarea>
+  <div class="pills-wrap">
+    <button class="pill" id="pill-food" type="button">🍜 먹방</button>
+    <button class="pill" id="pill-travel" type="button">✈️ 여행</button>
+    <button class="pill" id="pill-beauty" type="button">💄 뷰티</button>
+    <button class="pill" id="pill-daily" type="button">☀️ 일상</button>
+    <button class="pill" id="pill-review" type="button">📋 리뷰</button>
+  </div>
+</div>
+
+<!-- Analyze -->
+<div class="section">
+  <button class="analyze-btn" id="analyze-btn" type="button">✨ AI 분석 시작</button>
+</div>
+
+<!-- Status - always visible -->
+<div class="section">
+  <div class="status-box" id="status-box">대기 중 — 사진 업로드 후 분석 버튼을 눌러주세요</div>
+</div>
+
+<!-- Result -->
+<div class="section">
+  <div class="result-card" id="result-card">
+    <div class="result-header">
+      <div class="result-dot"></div>
+      <div class="result-title-text">AI 썸네일 전략 분석</div>
+    </div>
+    <div class="result-body" id="strategy-grid"></div>
+  </div>
+</div>
+
+<!-- Edit -->
+<div class="section edit-section" id="edit-section">
+  <div class="section-label">결과 수정 요청</div>
+  <div class="edit-row">
+    <input type="text" class="edit-input" id="edit-input" placeholder="더 밝게, 텍스트 크게...">
+    <button class="edit-send-btn" id="edit-send-btn" type="button">↑</button>
+  </div>
+</div>
+
+<!-- Canva -->
+<div class="section canva-section" id="canva-section">
+  <div class="section-label">Canva에서 열기</div>
+  <button class="canva-open-btn" id="canva-open-btn" type="button">🎨 Canva에서 편집하기</button>
+  <div class="canva-hint">Canva가 열리면 클립보드의 가이드를 붙여넣어 참고하세요</div>
+</div>
+
+<script>
+var selectedPlatform = 'youtube';
+var refImages = [];
+var myImages = [];
+var conversationHistory = [];
+var canvaPrompt = '';
+var isLoading = false;
+
+function setStatus(msg, type) {
+  var box = document.getElementById('status-box');
+  box.className = 'status-box' + (type ? ' ' + type : '');
+  box.innerHTML = (type === 'loading' ? '<span class="spinner"></span>' : '') + msg;
+}
+
+// Load saved key
+var savedKey = localStorage.getItem('openai_key');
+if (savedKey) {
+  document.getElementById('api-key').value = savedKey;
+  document.getElementById('key-status').innerHTML = '<div class="key-saved">✅ 저장된 키 불러옴</div>';
+}
+
+document.getElementById('api-key').addEventListener('input', function() {
+  var v = this.value.trim();
+  if (v.startsWith('sk-')) {
+    localStorage.setItem('openai_key', v);
+    document.getElementById('key-status').innerHTML = '<div class="key-saved">✅ 키 저장됨</div>';
+  }
+});
+
+document.getElementById('eye-btn').addEventListener('click', function() {
+  var inp = document.getElementById('api-key');
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+});
+
+// Platform
+['youtube','xiaohongshu','instagram'].forEach(function(p) {
+  document.getElementById('plt-' + p).addEventListener('click', function() {
+    document.querySelectorAll('.platform-btn').forEach(function(b) { b.classList.remove('active'); });
+    this.classList.add('active');
+    selectedPlatform = p;
+    var presets = { youtube: 'sz-yt', xiaohongshu: 'sz-xhs', instagram: 'sz-ig' };
+    if (presets[p]) document.getElementById(presets[p]).click();
+  });
+});
+
+// Size presets
+var sizePresets = {
+  'sz-yt':  { w: 1280, h: 720 },
+  'sz-xhs': { w: 1080, h: 1440 },
+  'sz-ig':  { w: 1080, h: 1080 },
+  'sz-st':  { w: 1080, h: 1920 }
+};
+Object.keys(sizePresets).forEach(function(id) {
+  document.getElementById(id).addEventListener('click', function() {
+    document.querySelectorAll('.size-preset').forEach(function(b) { b.classList.remove('active'); });
+    this.classList.add('active');
+    document.getElementById('size-w').value = sizePresets[id].w;
+    document.getElementById('size-h').value = sizePresets[id].h;
+    updateOrientation();
+  });
+});
+
+// Orientation
+document.getElementById('orient-land').addEventListener('click', function() {
+  document.getElementById('orient-land').classList.add('active');
+  document.getElementById('orient-port').classList.remove('active');
+  var w = parseInt(document.getElementById('size-w').value);
+  var h = parseInt(document.getElementById('size-h').value);
+  if (h > w) {
+    document.getElementById('size-w').value = h;
+    document.getElementById('size-h').value = w;
+  }
+});
+document.getElementById('orient-port').addEventListener('click', function() {
+  document.getElementById('orient-port').classList.add('active');
+  document.getElementById('orient-land').classList.remove('active');
+  var w = parseInt(document.getElementById('size-w').value);
+  var h = parseInt(document.getElementById('size-h').value);
+  if (w > h) {
+    document.getElementById('size-w').value = h;
+    document.getElementById('size-h').value = w;
+  }
+});
+
+function updateOrientation() {
+  var w = parseInt(document.getElementById('size-w').value);
+  var h = parseInt(document.getElementById('size-h').value);
+  if (w >= h) {
+    document.getElementById('orient-land').classList.add('active');
+    document.getElementById('orient-port').classList.remove('active');
+  } else {
+    document.getElementById('orient-port').classList.add('active');
+    document.getElementById('orient-land').classList.remove('active');
+  }
+}
+
+// Upload
+document.getElementById('ref-box').addEventListener('click', function() {
+  document.getElementById('ref-input').click();
+});
+document.getElementById('my-box').addEventListener('click', function() {
+  document.getElementById('my-input').click();
+});
+document.getElementById('ref-input').addEventListener('change', function() {
+  handleUpload(this.files, 'ref');
+});
+document.getElementById('my-input').addEventListener('change', function() {
+  handleUpload(this.files, 'my');
+});
+
+// 이미지 압축 함수
+function compressImage(dataUrl, maxW, maxH, quality) {
+  return new Promise(function(resolve) {
+    var img = new Image();
+    img.onload = function() {
+      var canvas = document.createElement('canvas');
+      var w = img.width, h = img.height;
+      if (w > maxW) { h = Math.round(h * maxW / w); w = maxW; }
+      if (h > maxH) { w = Math.round(w * maxH / h); h = maxH; }
+      canvas.width = w; canvas.height = h;
+      var ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, w, h);
+      resolve(canvas.toDataURL('image/jpeg', quality || 0.7));
+    };
+    img.src = dataUrl;
+  });
+}
+
+function handleUpload(files, type) {
+  var arr = Array.from(files);
+  if (!arr.length) return;
+  var max = type === 'ref' ? 3 : 5;
+  arr = arr.slice(0, max);
+  setStatus('이미지 압축 중...', 'loading');
+
+  var promises = arr.map(function(f) {
+    return new Promise(function(res) {
+      var r = new FileReader();
+      r.onload = function(e) {
+        // 압축: 최대 800px, 품질 0.7
+        compressImage(e.target.result, 800, 800, 0.7).then(res);
+      };
+      r.readAsDataURL(f);
+    });
+  });
+
+  Promise.all(promises).then(function(results) {
+    if (type === 'ref') refImages = results;
+    else myImages = results;
+
+    var boxId = type === 'ref' ? 'ref-box' : 'my-box';
+    var box = document.getElementById(boxId);
+    box.classList.add('filled');
+    var icon = box.querySelector('.upload-icon');
+    var label = box.querySelector('.upload-label');
+    var sub = box.querySelector('.upload-sublabel');
+    if (icon) icon.style.display = 'none';
+    if (label) label.style.display = 'none';
+    if (sub) sub.style.display = 'none';
+    var img = box.querySelector('img');
+    if (!img) { img = document.createElement('img'); box.appendChild(img); }
+    img.src = results[0];
+    var badge = box.querySelector('.count-badge');
+    if (!badge) { badge = document.createElement('div'); badge.className = 'count-badge'; box.appendChild(badge); }
+    badge.textContent = results.length + '장';
+
+    setStatus('✅ ' + (type === 'ref' ? '레퍼런스' : '내 사진') + ' ' + results.length + '장 준비됨 (압축 완료)', 'success');
+  });
+}
+
+// Pills
+var pillMap = {
+  'pill-food': '밝고 식욕 자극, 먹방 스타일',
+  'pill-travel': '감성 여행 vlog, 영화같은 느낌',
+  'pill-beauty': '뷰티/패션, 트렌디하고 세련된 느낌',
+  'pill-daily': '일상 vlog, 친근하고 따뜻한 분위기',
+  'pill-review': '정보/리뷰, 신뢰감 있고 깔끔한 느낌'
+};
+Object.keys(pillMap).forEach(function(id) {
+  document.getElementById(id).addEventListener('click', function() {
+    document.getElementById('user-prompt').value = pillMap[id];
+  });
+});
+
+// Analyze button
+document.getElementById('analyze-btn').addEventListener('click', function() {
+  if (isLoading) return;
+  doAnalyze();
+});
+
+function buildSystem() {
+  var names = { youtube: 'YouTube', xiaohongshu: '샤오홍슈(小红书)', instagram: 'Instagram' };
+  var pName = names[selectedPlatform] || 'YouTube';
+  var w = document.getElementById('size-w').value;
+  var h = document.getElementById('size-h').value;
+  return '당신은 ' + pName + ' 썸네일 전략 전문가입니다.\n출력 사이즈: ' + w + 'x' + h + 'px\n반드시 순수 JSON만 응답하세요. 코드블록 없이:\n{"best_photo":"내 사진 중 썸네일 추천 설명","title_text":"핵심 텍스트 10자 이내","subtitle_text":"서브텍스트 또는 null","layout":"레이아웃 설명","color_scheme":"색상 전략","hook_element":"' + pName + ' 클릭률 포인트","canva_prompt":"Canva 제작 가이드 3-4문장"}';
+}
+
+function doAnalyze() {
+  var apiKey = document.getElementById('api-key').value.trim();
+  if (!apiKey) { setStatus('❌ ChatGPT API 키를 입력해주세요', 'error'); return; }
+  if (!refImages.length && !myImages.length) { setStatus('❌ 사진을 최소 1장 업로드해주세요', 'error'); return; }
+
+  isLoading = true;
+  document.getElementById('analyze-btn').disabled = true;
+  document.getElementById('result-card').classList.remove('show');
+  document.getElementById('edit-section').classList.remove('show');
+  document.getElementById('canva-section').classList.remove('show');
+  setStatus('이미지 전송 중...', 'loading');
+
+  var content = [];
+  if (refImages.length) {
+    content.push({ type: 'text', text: '참고 썸네일 ' + refImages.length + '장:' });
+    refImages.forEach(function(img) {
+      content.push({ type: 'image_url', image_url: { url: img, detail: 'low' } });
+    });
+  }
+  if (myImages.length) {
+    content.push({ type: 'text', text: '내 영상 캡처 ' + myImages.length + '장:' });
+    myImages.forEach(function(img) {
+      content.push({ type: 'image_url', image_url: { url: img, detail: 'low' } });
+    });
+  }
+  var extra = document.getElementById('user-prompt').value.trim();
+  var txt = '위 이미지들을 분석해서 썸네일 전략을 제안해주세요.';
+  if (extra) txt += '\n추가 요청: ' + extra;
+  content.push({ type: 'text', text: txt });
+
+  conversationHistory = [{ role: 'user', content: content }];
+
+  var body = JSON.stringify({
+    model: 'gpt-4o',
+    max_tokens: 1000,
+    messages: [{ role: 'system', content: buildSystem() }].concat(conversationHistory)
+  });
+
+  setStatus('AI가 분석 중... (10~30초 소요)', 'loading');
+
+  fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + apiKey
+    },
+    body: body
+  })
+  .then(function(resp) {
+    setStatus('응답 처리 중...', 'loading');
+    return resp.json().then(function(data) {
+      return { ok: resp.ok, status: resp.status, data: data };
+    });
+  })
+  .then(function(result) {
+    if (!result.ok) {
+      var errMsg = (result.data && result.data.error && result.data.error.message) || ('HTTP ' + result.status);
+      throw new Error(errMsg);
+    }
+    var text = result.data.choices[0].message.content;
+    conversationHistory.push({ role: 'assistant', content: text });
+    canvaPrompt = '';
+    renderResult(text);
+    setStatus('✅ 분석 완료!', 'success');
+  })
+  .catch(function(err) {
+    var msg = err.message || String(err);
+    setStatus('❌ 오류: ' + msg, 'error');
+  })
+  .finally(function() {
+    isLoading = false;
+    document.getElementById('analyze-btn').disabled = false;
+  });
+}
+
+function renderResult(text) {
+  var parsed;
+  try {
+    var clean = text.replace(/```json/g,'').replace(/```/g,'').trim();
+    parsed = JSON.parse(clean);
+  } catch(e) {
+    document.getElementById('strategy-grid').innerHTML =
+      '<div class="strategy-item"><div class="scontent">' + text.replace(/</g,'&lt;') + '</div></div>';
+    showResult();
+    return;
+  }
+  canvaPrompt = parsed.canva_prompt || '';
+  var items = [
+    { cls: 'stag-red',    label: '추천 사진',       val: parsed.best_photo },
+    { cls: 'stag-orange', label: '핵심 텍스트',      val: parsed.title_text + (parsed.subtitle_text ? '\n서브: ' + parsed.subtitle_text : '') },
+    { cls: 'stag-blue',   label: '레이아웃',         val: parsed.layout },
+    { cls: 'stag-green',  label: '색상 전략',        val: parsed.color_scheme },
+    { cls: 'stag-purple', label: '클릭률 포인트',    val: parsed.hook_element },
+    { cls: 'stag-blue',   label: 'Canva 제작 가이드', val: parsed.canva_prompt }
+  ].filter(function(i) { return i.val; });
+
+  document.getElementById('strategy-grid').innerHTML = items.map(function(i) {
+    return '<div class="strategy-item"><span class="stag ' + i.cls + '">' + i.label + '</span>'
+      + '<div class="scontent">' + i.val.replace(/\n/g,'<br>') + '</div></div>';
+  }).join('');
+  showResult();
+}
+
+function showResult() {
+  document.getElementById('result-card').classList.add('show');
+  document.getElementById('edit-section').classList.add('show');
+  document.getElementById('canva-section').classList.add('show');
+  setTimeout(function() {
+    document.getElementById('result-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 100);
+}
+
+// Edit
+document.getElementById('edit-send-btn').addEventListener('click', function() { doEdit(); });
+document.getElementById('edit-input').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') doEdit();
+});
+
+function doEdit() {
+  var txt = document.getElementById('edit-input').value.trim();
+  if (!txt || isLoading) return;
+  var apiKey = document.getElementById('api-key').value.trim();
+  if (!apiKey) { setStatus('❌ API 키를 입력해주세요', 'error'); return; }
+
+  document.getElementById('edit-input').value = '';
+  isLoading = true;
+  setStatus('수정 중...', 'loading');
+
+  conversationHistory.push({ role: 'user', content: '다음 요청으로 수정해주세요: ' + txt + '\n같은 JSON 형식으로만 응답.' });
+
+  fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + apiKey },
+    body: JSON.stringify({ model: 'gpt-4o', max_tokens: 1000, messages: [{ role: 'system', content: buildSystem() }].concat(conversationHistory) })
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(data) {
+    var text = data.choices[0].message.content;
+    conversationHistory.push({ role: 'assistant', content: text });
+    renderResult(text);
+    setStatus('✅ 수정 완료!', 'success');
+  })
+  .catch(function(err) {
+    setStatus('❌ 오류: ' + (err.message || String(err)), 'error');
+  })
+  .finally(function() { isLoading = false; });
+}
+
+// Canva
+document.getElementById('canva-open-btn').addEventListener('click', function() {
+  var urls = {
+    'sz-yt':  'https://www.canva.com/design/new?type=youtube_thumbnail',
+    'sz-ig':  'https://www.canva.com/design/new?type=instagram_post',
+    'sz-xhs': 'https://www.canva.com/design/new?type=pinterest_pin',
+    'sz-st':  'https://www.canva.com/design/new?type=your_story'
+  };
+  var activePreset = document.querySelector('.size-preset.active');
+  var url = (activePreset && urls[activePreset.id]) || 'https://www.canva.com';
+  if (canvaPrompt && navigator.clipboard) {
+    navigator.clipboard.writeText(canvaPrompt).then(function() {
+      alert('📋 Canva 가이드가 복사됐어요!\nCanva에서 붙여넣기해서 참고하세요.');
+      window.open(url, '_blank');
+    }).catch(function() { window.open(url, '_blank'); });
+  } else {
+    window.open(url, '_blank');
+  }
+});
+</script>
+</body>
+</html>
