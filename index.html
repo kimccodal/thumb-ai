@@ -159,6 +159,17 @@ input[type=file]{display:none;}
   <div class="api-hint">🔑 <a href="https://platform.openai.com/api-keys" target="_blank">platform.openai.com</a> → API keys → Create key</div>
 </div>
 
+<!-- imgbb Key -->
+<div class="section">
+  <div class="section-label">이미지 업로드 키 (imgbb)</div>
+  <div class="input-wrap">
+    <input type="password" class="text-input" id="imgbb-key" placeholder="imgbb API 키 입력..." autocomplete="off">
+    <button class="eye-btn" id="eye-btn2" type="button">👁</button>
+  </div>
+  <div id="imgbb-status"></div>
+  <div class="api-hint">🔑 <a href="https://api.imgbb.com" target="_blank">api.imgbb.com</a> → Get API key (무료)</div>
+</div>
+
 <!-- Prompt -->
 <div class="section">
   <div class="section-label">추가 요청 (선택)</div>
@@ -217,6 +228,8 @@ function setStatus(msg, type) {
 }
 
 var savedKey = localStorage.getItem('openai_key') || '';
+var savedImgbb = localStorage.getItem('imgbb_key') || '';
+if (savedImgbb) { document.getElementById('imgbb-key').value = savedImgbb; document.getElementById('imgbb-status').innerHTML = '<div class="key-saved">✅ 저장된 키 불러옴</div>'; }
 if (savedKey) { document.getElementById('api-key').value = savedKey; document.getElementById('key-status').innerHTML = '<div class="key-saved">✅ 저장된 키 불러옴</div>'; }
 
 document.getElementById('api-key').addEventListener('input', function() {
@@ -226,6 +239,14 @@ document.getElementById('api-key').addEventListener('input', function() {
 
 document.getElementById('eye-btn').addEventListener('click', function() {
   var inp = document.getElementById('api-key');
+document.getElementById('imgbb-key').addEventListener('input', function() {
+  var v = this.value.trim();
+  if (v.length > 5) { localStorage.setItem('imgbb_key', v); document.getElementById('imgbb-status').innerHTML = '<div class="key-saved">✅ 키 저장됨</div>'; }
+});
+document.getElementById('eye-btn2').addEventListener('click', function() {
+  var inp = document.getElementById('imgbb-key');
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+});
   inp.type = inp.type === 'password' ? 'text' : 'password';
 });
 
@@ -291,7 +312,7 @@ function compressImage(dataUrl, maxW, maxH, quality) {
 
 // imgbb에 업로드해서 URL 반환
 function uploadToImgbb(base64) {
-  var apiKey = '4b8f6e3c2a1d9b7e5f8c2a1d'; // 무료 공개 키
+  var apiKey = localStorage.getItem('imgbb_key') || '';
   var data = base64.split(',')[1];
   return fetch('https://api.imgbb.com/1/upload?key=' + apiKey, {
     method: 'POST',
@@ -353,6 +374,8 @@ function buildSystem() {
 function doAnalyze() {
   var apiKey = document.getElementById('api-key').value.trim();
   if (!apiKey) { setStatus('❌ ChatGPT API 키를 입력해주세요', 'error'); return; }
+  var imgbbKey = localStorage.getItem('imgbb_key') || '';
+  if (!imgbbKey) { setStatus('❌ imgbb API 키를 입력해주세요', 'error'); return; }
   if (!refImages.length && !myImages.length) { setStatus('❌ 사진을 최소 1장 업로드해주세요', 'error'); return; }
 
   isLoading = true;
