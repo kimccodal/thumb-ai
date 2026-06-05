@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>ThumbAI</title>
 <style>
-:root { --bg:#0a0a0a;--surface:#141414;--surface2:#1e1e1e;--border:#2a2a2a;--accent:#ff3c3c;--accent2:#ff6b35;--text:#f0f0f0;--muted:#888;--radius:14px; }
+:root{--bg:#0a0a0a;--surface:#141414;--surface2:#1e1e1e;--border:#2a2a2a;--accent:#ff3c3c;--accent2:#ff6b35;--text:#f0f0f0;--muted:#888;--radius:14px;}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
 html,body{background:var(--bg);color:var(--text);font-family:'Apple SD Gothic Neo','Noto Sans KR',sans-serif;}
 body{padding:0 0 80px;}
@@ -44,24 +44,27 @@ input[type=file]{display:none;}
 .size-orientation{display:flex;gap:8px;margin-top:10px;}
 .orient-btn{flex:1;background:var(--surface);border:2px solid var(--border);border-radius:10px;padding:12px;cursor:pointer;text-align:center;font-size:13px;color:var(--muted);font-weight:600;-webkit-appearance:none;min-height:48px;}
 .orient-btn.active{border-color:#64dc96;background:rgba(100,220,150,0.1);color:#64dc96;}
-.input-wrap{position:relative;}
-.text-input,.textarea-input{width:100%;background:var(--surface);border:2px solid var(--border);border-radius:12px;padding:14px 16px;color:var(--text);font-size:15px;font-family:inherit;outline:none;-webkit-appearance:none;}
-.text-input{padding-right:48px;}
-.textarea-input{resize:none;min-height:88px;line-height:1.6;}
-.text-input::placeholder,.textarea-input::placeholder{color:#555;}
-.eye-btn{position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--muted);font-size:20px;padding:8px;min-width:44px;min-height:44px;display:flex;align-items:center;justify-content:center;}
-.api-hint{font-size:11px;color:#555;margin-top:8px;line-height:1.6;}
-.api-hint a{color:#777;text-decoration:underline;}
-.key-saved{font-size:11px;color:#64dc96;margin-top:6px;}
+.key-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;display:flex;flex-direction:column;gap:12px;}
+.key-row{display:flex;flex-direction:column;gap:6px;}
+.key-label{font-size:11px;color:var(--muted);font-weight:600;}
+.key-input-wrap{position:relative;}
+.key-input{width:100%;background:var(--surface2);border:2px solid var(--border);border-radius:10px;padding:12px 44px 12px 14px;color:var(--text);font-size:14px;font-family:inherit;outline:none;-webkit-appearance:none;}
+.key-input::placeholder{color:#444;}
+.key-input.has-value{border-color:#64dc96;}
+.eye-btn{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--muted);font-size:18px;padding:8px;min-width:40px;min-height:40px;display:flex;align-items:center;justify-content:center;}
+.key-hint{font-size:10px;color:#555;line-height:1.5;}
+.key-hint a{color:#666;text-decoration:underline;}
+.divider{height:1px;background:var(--border);}
+.textarea-input{width:100%;background:var(--surface);border:2px solid var(--border);border-radius:12px;padding:14px 16px;color:var(--text);font-size:15px;font-family:inherit;outline:none;-webkit-appearance:none;resize:none;min-height:88px;line-height:1.6;}
+.textarea-input::placeholder{color:#555;}
 .pills-wrap{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-top:10px;scrollbar-width:none;}
 .pills-wrap::-webkit-scrollbar{display:none;}
 .pill{flex-shrink:0;background:var(--surface);border:1.5px solid var(--border);border-radius:20px;padding:8px 14px;font-size:12px;color:var(--muted);cursor:pointer;white-space:nowrap;-webkit-appearance:none;min-height:36px;display:flex;align-items:center;}
 .analyze-btn{width:100%;padding:18px;background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:16px;color:#fff;font-size:17px;font-weight:800;cursor:pointer;-webkit-appearance:none;min-height:56px;}
 .analyze-btn:disabled{opacity:0.4;}
-.status-box{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:14px 16px;font-size:13px;color:var(--muted);line-height:1.6;min-height:48px;}
+.status-box{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:14px 16px;font-size:13px;color:var(--muted);line-height:1.7;min-height:48px;}
 .status-box.error{border-color:#ff3c3c;color:#ff8888;background:rgba(255,60,60,0.08);}
 .status-box.success{border-color:#64dc96;color:#64dc96;background:rgba(100,220,150,0.08);}
-.status-box.loading{color:#aaa;}
 .spinner{display:inline-block;width:14px;height:14px;border:2px solid #444;border-top-color:var(--accent);border-radius:50%;animation:spin 0.8s linear infinite;margin-right:8px;vertical-align:middle;}
 @keyframes spin{to{transform:rotate(360deg);}}
 .result-card{display:none;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;}
@@ -86,8 +89,6 @@ input[type=file]{display:none;}
 .canva-section{display:none;}.canva-section.show{display:block;}
 .canva-open-btn{width:100%;padding:17px;background:#7c4dff;border:none;border-radius:16px;color:#fff;font-size:16px;font-weight:800;cursor:pointer;-webkit-appearance:none;min-height:54px;display:flex;align-items:center;justify-content:center;gap:8px;}
 .canva-hint{font-size:11px;color:#555;text-align:center;margin-top:8px;}
-.imgbb-hint{font-size:11px;color:#666;margin-top:8px;line-height:1.6;}
-.imgbb-hint a{color:#888;text-decoration:underline;}
 </style>
 </head>
 <body>
@@ -113,17 +114,14 @@ input[type=file]{display:none;}
   <div class="upload-grid">
     <div>
       <div class="upload-col-label">참고 썸네일 (최대 3장)</div>
-      <div class="upload-box" id="ref-box" role="button" tabindex="0"><span class="upload-icon">🖼</span><div class="upload-label">인기 썸네일<br>레퍼런스</div><div class="upload-sublabel">분석할 예시</div></div>
+      <div class="upload-box" id="ref-box"><span class="upload-icon">🖼</span><div class="upload-label">인기 썸네일<br>레퍼런스</div><div class="upload-sublabel">분석할 예시</div></div>
       <input type="file" id="ref-input" multiple accept="image/*">
     </div>
     <div>
       <div class="upload-col-label">내 영상 캡처 (최대 5장)</div>
-      <div class="upload-box" id="my-box" role="button" tabindex="0"><span class="upload-icon">📷</span><div class="upload-label">내 영상에서<br>캡처한 사진</div><div class="upload-sublabel">썸네일 후보</div></div>
+      <div class="upload-box" id="my-box"><span class="upload-icon">📷</span><div class="upload-label">내 영상에서<br>캡처한 사진</div><div class="upload-sublabel">썸네일 후보</div></div>
       <input type="file" id="my-input" multiple accept="image/*">
     </div>
-  </div>
-  <div class="imgbb-hint">
-    💡 이미지는 <a href="https://imgbb.com" target="_blank">imgbb.com</a>에 무료 업로드 후 URL을 아래에 직접 붙여넣기도 가능해요
   </div>
 </div>
 
@@ -148,26 +146,30 @@ input[type=file]{display:none;}
   </div>
 </div>
 
-<!-- API Keys -->
+<!-- API Keys - 한 섹션에 묶음 -->
 <div class="section">
-  <div class="section-label">ChatGPT API 키</div>
-  <div class="input-wrap">
-    <input type="password" class="text-input" id="api-key" placeholder="sk-..." autocomplete="off">
-    <button class="eye-btn" id="eye-btn" type="button">👁</button>
+  <div class="section-label">API 키 설정</div>
+  <div class="key-section">
+    <div class="key-row">
+      <div class="key-label">ChatGPT API 키</div>
+      <div class="key-input-wrap">
+        <input type="password" class="key-input" id="api-key" placeholder="sk-..." autocomplete="off">
+        <button class="eye-btn" id="eye-btn1" type="button">👁</button>
+      </div>
+      <div class="key-hint">🔑 <a href="https://platform.openai.com/api-keys" target="_blank">platform.openai.com</a> → API keys → Create</div>
+    </div>
+    <div class="divider"></div>
+    <div class="key-row">
+      <div class="key-label">imgbb 키 (이미지 업로드용)</div>
+      <div class="key-input-wrap">
+        <input type="password" class="key-input" id="imgbb-key" placeholder="imgbb API 키..." autocomplete="off">
+        <button class="eye-btn" id="eye-btn2" type="button">👁</button>
+      </div>
+      <div class="key-hint">🔑 <a href="https://api.imgbb.com" target="_blank">api.imgbb.com</a> → Get API key (무료)</div>
+    </div>
+    <button type="button" id="save-keys-btn" style="background:var(--surface2);border:2px solid var(--border);border-radius:10px;padding:12px;color:var(--muted);font-size:13px;font-weight:700;cursor:pointer;-webkit-appearance:none;min-height:44px;">💾 키 저장하기</button>
+    <div id="keys-saved-msg" style="font-size:12px;color:#64dc96;text-align:center;display:none;">✅ 저장됨! 다음에 자동으로 불러와요</div>
   </div>
-  <div id="key-status"></div>
-  <div class="api-hint">🔑 <a href="https://platform.openai.com/api-keys" target="_blank">platform.openai.com</a> → API keys → Create key</div>
-</div>
-
-<!-- imgbb Key -->
-<div class="section">
-  <div class="section-label">이미지 업로드 키 (imgbb)</div>
-  <div class="input-wrap">
-    <input type="password" class="text-input" id="imgbb-key" placeholder="imgbb API 키 입력..." autocomplete="off">
-    <button class="eye-btn" id="eye-btn2" type="button">👁</button>
-  </div>
-  <div id="imgbb-status"></div>
-  <div class="api-hint">🔑 <a href="https://api.imgbb.com" target="_blank">api.imgbb.com</a> → Get API key (무료)</div>
 </div>
 
 <!-- Prompt -->
@@ -221,46 +223,65 @@ var conversationHistory = [];
 var canvaPrompt = '';
 var isLoading = false;
 
+// 키 로드
+function loadKeys() {
+  try {
+    var ok = localStorage.getItem('openai_key') || '';
+    var ik = localStorage.getItem('imgbb_key') || '';
+    if (ok) { document.getElementById('api-key').value = ok; document.getElementById('api-key').classList.add('has-value'); }
+    if (ik) { document.getElementById('imgbb-key').value = ik; document.getElementById('imgbb-key').classList.add('has-value'); }
+    if (ok && ik) { document.getElementById('keys-saved-msg').style.display = 'block'; }
+  } catch(e) {}
+}
+loadKeys();
+
+// 키 저장 버튼
+document.getElementById('save-keys-btn').addEventListener('click', function() {
+  var ok = document.getElementById('api-key').value.trim();
+  var ik = document.getElementById('imgbb-key').value.trim();
+  if (!ok) { setStatus('❌ ChatGPT API 키를 입력해주세요', 'error'); return; }
+  if (!ik) { setStatus('❌ imgbb API 키를 입력해주세요', 'error'); return; }
+  try {
+    localStorage.setItem('openai_key', ok);
+    localStorage.setItem('imgbb_key', ik);
+    document.getElementById('api-key').classList.add('has-value');
+    document.getElementById('imgbb-key').classList.add('has-value');
+    document.getElementById('keys-saved-msg').style.display = 'block';
+    setStatus('✅ 키 저장 완료! 다음에 자동으로 불러와요', 'success');
+  } catch(e) {
+    setStatus('❌ 저장 실패: ' + e.message, 'error');
+  }
+});
+
+// 눈 버튼
+document.getElementById('eye-btn1').addEventListener('click', function() {
+  var inp = document.getElementById('api-key');
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+});
+document.getElementById('eye-btn2').addEventListener('click', function() {
+  var inp = document.getElementById('imgbb-key');
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+});
+
 function setStatus(msg, type) {
   var box = document.getElementById('status-box');
   box.className = 'status-box' + (type ? ' ' + type : '');
   box.innerHTML = (type === 'loading' ? '<span class="spinner"></span>' : '') + msg;
 }
 
-var savedKey = localStorage.getItem('openai_key') || '';
-var savedImgbb = localStorage.getItem('imgbb_key') || '';
-if (savedImgbb) { document.getElementById('imgbb-key').value = savedImgbb; document.getElementById('imgbb-status').innerHTML = '<div class="key-saved">✅ 저장된 키 불러옴</div>'; }
-if (savedKey) { document.getElementById('api-key').value = savedKey; document.getElementById('key-status').innerHTML = '<div class="key-saved">✅ 저장된 키 불러옴</div>'; }
-
-document.getElementById('api-key').addEventListener('input', function() {
-  var v = this.value.trim();
-  if (v.startsWith('sk-')) { localStorage.setItem('openai_key', v); document.getElementById('key-status').innerHTML = '<div class="key-saved">✅ 키 저장됨</div>'; }
-});
-
-document.getElementById('eye-btn').addEventListener('click', function() {
-  var inp = document.getElementById('api-key');
-document.getElementById('imgbb-key').addEventListener('input', function() {
-  var v = this.value.trim();
-  if (v.length > 5) { localStorage.setItem('imgbb_key', v); document.getElementById('imgbb-status').innerHTML = '<div class="key-saved">✅ 키 저장됨</div>'; }
-});
-document.getElementById('eye-btn2').addEventListener('click', function() {
-  var inp = document.getElementById('imgbb-key');
-  inp.type = inp.type === 'password' ? 'text' : 'password';
-});
-  inp.type = inp.type === 'password' ? 'text' : 'password';
-});
-
+// Platform
 ['youtube','xiaohongshu','instagram'].forEach(function(p) {
   document.getElementById('plt-' + p).addEventListener('click', function() {
     document.querySelectorAll('.platform-btn').forEach(function(b) { b.classList.remove('active'); });
     this.classList.add('active');
     selectedPlatform = p;
-    var presets = { youtube: 'sz-yt', xiaohongshu: 'sz-xhs', instagram: 'sz-ig' };
+    var presets = { youtube:'sz-yt', xiaohongshu:'sz-xhs', instagram:'sz-ig' };
     if (presets[p]) document.getElementById(presets[p]).click();
   });
 });
 
-var sizePresets = { 'sz-yt': {w:1280,h:720}, 'sz-xhs': {w:1080,h:1440}, 'sz-ig': {w:1080,h:1080}, 'sz-st': {w:1080,h:1920} };
+// Size presets
+var sizePresets = { 'sz-yt':{w:1280,h:720}, 'sz-xhs':{w:1080,h:1440}, 'sz-ig':{w:1080,h:1080}, 'sz-st':{w:1080,h:1920} };
 Object.keys(sizePresets).forEach(function(id) {
   document.getElementById(id).addEventListener('click', function() {
     document.querySelectorAll('.size-preset').forEach(function(b) { b.classList.remove('active'); });
@@ -289,6 +310,7 @@ function updateOrientation() {
   else { document.getElementById('orient-port').classList.add('active'); document.getElementById('orient-land').classList.remove('active'); }
 }
 
+// Upload
 document.getElementById('ref-box').addEventListener('click', function() { document.getElementById('ref-input').click(); });
 document.getElementById('my-box').addEventListener('click', function() { document.getElementById('my-input').click(); });
 document.getElementById('ref-input').addEventListener('change', function() { handleUpload(this.files, 'ref'); });
@@ -310,27 +332,10 @@ function compressImage(dataUrl, maxW, maxH, quality) {
   });
 }
 
-// imgbb에 업로드해서 URL 반환
-function uploadToImgbb(base64) {
-  var apiKey = localStorage.getItem('imgbb_key') || '';
-  var data = base64.split(',')[1];
-  return fetch('https://api.imgbb.com/1/upload?key=' + apiKey, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: 'image=' + encodeURIComponent(data)
-  })
-  .then(function(r) { return r.json(); })
-  .then(function(d) {
-    if (d.success) return d.data.url;
-    throw new Error('이미지 업로드 실패');
-  });
-}
-
 function handleUpload(files, type) {
   var arr = Array.from(files).slice(0, type === 'ref' ? 3 : 5);
   if (!arr.length) return;
   setStatus('이미지 준비 중...', 'loading');
-
   Promise.all(arr.map(function(f) {
     return new Promise(function(res) {
       var r = new FileReader();
@@ -340,20 +345,16 @@ function handleUpload(files, type) {
   })).then(function(results) {
     if (type === 'ref') refImages = results;
     else myImages = results;
-
     var box = document.getElementById(type === 'ref' ? 'ref-box' : 'my-box');
     box.classList.add('filled');
-    ['upload-icon','upload-label','upload-sublabel'].forEach(function(c) {
-      var el = box.querySelector('.' + c);
-      if (el) el.style.display = 'none';
-    });
+    ['upload-icon','upload-label','upload-sublabel'].forEach(function(c) { var el = box.querySelector('.'+c); if(el) el.style.display='none'; });
     var img = box.querySelector('img');
     if (!img) { img = document.createElement('img'); box.appendChild(img); }
     img.src = results[0];
     var badge = box.querySelector('.count-badge');
     if (!badge) { badge = document.createElement('div'); badge.className = 'count-badge'; box.appendChild(badge); }
     badge.textContent = results.length + '장';
-    setStatus('✅ ' + (type === 'ref' ? '레퍼런스' : '내 사진') + ' ' + results.length + '장 준비됨', 'success');
+    setStatus('✅ ' + (type==='ref'?'레퍼런스':'내 사진') + ' ' + results.length + '장 준비됨', 'success');
   });
 }
 
@@ -364,6 +365,13 @@ Object.keys(pillMap).forEach(function(id) {
 
 document.getElementById('analyze-btn').addEventListener('click', function() { if (!isLoading) doAnalyze(); });
 
+function getKeys() {
+  return {
+    openai: document.getElementById('api-key').value.trim(),
+    imgbb: document.getElementById('imgbb-key').value.trim()
+  };
+}
+
 function buildSystem() {
   var names = { youtube:'YouTube', xiaohongshu:'샤오홍슈(小红书)', instagram:'Instagram' };
   var pName = names[selectedPlatform] || 'YouTube';
@@ -371,11 +379,24 @@ function buildSystem() {
   return '당신은 ' + pName + ' 썸네일 전략 전문가입니다.\n출력 사이즈: ' + w + 'x' + h + 'px\n반드시 순수 JSON만 응답하세요. 코드블록 없이:\n{"best_photo":"내 사진 중 썸네일 추천 설명","title_text":"핵심 텍스트 10자 이내","subtitle_text":"서브텍스트 또는 null","layout":"레이아웃 설명","color_scheme":"색상 전략","hook_element":"' + pName + ' 클릭률 포인트","canva_prompt":"Canva 제작 가이드 3-4문장"}';
 }
 
+function uploadToImgbb(base64, imgbbKey) {
+  var data = base64.split(',')[1];
+  return fetch('https://api.imgbb.com/1/upload?key=' + imgbbKey, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: 'image=' + encodeURIComponent(data)
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(d) {
+    if (d.success) return d.data.url;
+    throw new Error('imgbb 업로드 실패: ' + (d.error && d.error.message || JSON.stringify(d)));
+  });
+}
+
 function doAnalyze() {
-  var apiKey = document.getElementById('api-key').value.trim();
-  if (!apiKey) { setStatus('❌ ChatGPT API 키를 입력해주세요', 'error'); return; }
-  var imgbbKey = localStorage.getItem('imgbb_key') || '';
-  if (!imgbbKey) { setStatus('❌ imgbb API 키를 입력해주세요', 'error'); return; }
+  var keys = getKeys();
+  if (!keys.openai) { setStatus('❌ ChatGPT API 키를 입력하고 저장해주세요', 'error'); return; }
+  if (!keys.imgbb) { setStatus('❌ imgbb API 키를 입력하고 저장해주세요', 'error'); return; }
   if (!refImages.length && !myImages.length) { setStatus('❌ 사진을 최소 1장 업로드해주세요', 'error'); return; }
 
   isLoading = true;
@@ -383,60 +404,50 @@ function doAnalyze() {
   document.getElementById('result-card').classList.remove('show');
   document.getElementById('edit-section').classList.remove('show');
   document.getElementById('canva-section').classList.remove('show');
-  setStatus('이미지 서버에 업로드 중...', 'loading');
+  setStatus('이미지 업로드 중... (1/2)', 'loading');
 
-  // 모든 이미지를 imgbb에 업로드해서 URL 획득
   var allImages = [];
-  var refCount = refImages.length;
-  refImages.forEach(function(img) { allImages.push({ img: img, type: 'ref' }); });
-  myImages.forEach(function(img) { allImages.push({ img: img, type: 'my' }); });
+  refImages.forEach(function(img) { allImages.push({ img:img, type:'ref' }); });
+  myImages.forEach(function(img) { allImages.push({ img:img, type:'my' }); });
 
   Promise.all(allImages.map(function(item) {
-    return uploadToImgbb(item.img).then(function(url) { return { url: url, type: item.type }; });
+    return uploadToImgbb(item.img, keys.imgbb).then(function(url) { return { url:url, type:item.type }; });
   }))
   .then(function(uploaded) {
-    setStatus('AI 분석 중... (10~30초)', 'loading');
+    setStatus('AI 분석 중... (2/2, 10~30초)', 'loading');
     var content = [];
-    var refs = uploaded.filter(function(u) { return u.type === 'ref'; });
-    var mys = uploaded.filter(function(u) { return u.type === 'my'; });
-
+    var refs = uploaded.filter(function(u) { return u.type==='ref'; });
+    var mys  = uploaded.filter(function(u) { return u.type==='my'; });
     if (refs.length) {
-      content.push({ type: 'text', text: '참고 썸네일 ' + refs.length + '장:' });
-      refs.forEach(function(u) { content.push({ type: 'image_url', image_url: { url: u.url, detail: 'low' } }); });
+      content.push({ type:'text', text:'참고 썸네일 ' + refs.length + '장:' });
+      refs.forEach(function(u) { content.push({ type:'image_url', image_url:{ url:u.url, detail:'low' } }); });
     }
     if (mys.length) {
-      content.push({ type: 'text', text: '내 영상 캡처 ' + mys.length + '장:' });
-      mys.forEach(function(u) { content.push({ type: 'image_url', image_url: { url: u.url, detail: 'low' } }); });
+      content.push({ type:'text', text:'내 영상 캡처 ' + mys.length + '장:' });
+      mys.forEach(function(u) { content.push({ type:'image_url', image_url:{ url:u.url, detail:'low' } }); });
     }
     var extra = document.getElementById('user-prompt').value.trim();
     var txt = '위 이미지들을 분석해서 썸네일 전략을 제안해주세요.';
     if (extra) txt += '\n추가 요청: ' + extra;
-    content.push({ type: 'text', text: txt });
-    conversationHistory = [{ role: 'user', content: content }];
+    content.push({ type:'text', text:txt });
+    conversationHistory = [{ role:'user', content:content }];
 
     return fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + apiKey },
-      body: JSON.stringify({ model: 'gpt-4o', max_tokens: 1000, messages: [{ role: 'system', content: buildSystem() }].concat(conversationHistory) })
+      method:'POST',
+      headers:{ 'Content-Type':'application/json', 'Authorization':'Bearer ' + keys.openai },
+      body: JSON.stringify({ model:'gpt-4o', max_tokens:1000, messages:[{ role:'system', content:buildSystem() }].concat(conversationHistory) })
     });
   })
-  .then(function(r) {
-    return r.json().then(function(d) { return { ok: r.ok, status: r.status, data: d }; });
-  })
+  .then(function(r) { return r.json().then(function(d) { return { ok:r.ok, status:r.status, data:d }; }); })
   .then(function(result) {
     if (!result.ok) throw new Error((result.data.error && result.data.error.message) || 'HTTP ' + result.status);
     var text = result.data.choices[0].message.content;
-    conversationHistory.push({ role: 'assistant', content: text });
+    conversationHistory.push({ role:'assistant', content:text });
     renderResult(text);
     setStatus('✅ 분석 완료!', 'success');
   })
-  .catch(function(err) {
-    setStatus('❌ 오류: ' + (err.message || String(err)), 'error');
-  })
-  .finally(function() {
-    isLoading = false;
-    document.getElementById('analyze-btn').disabled = false;
-  });
+  .catch(function(err) { setStatus('❌ 오류: ' + (err.message || String(err)), 'error'); })
+  .finally(function() { isLoading = false; document.getElementById('analyze-btn').disabled = false; });
 }
 
 function renderResult(text) {
@@ -449,14 +460,14 @@ function renderResult(text) {
   canvaPrompt = parsed.canva_prompt || '';
   var items = [
     { cls:'stag-red',    label:'추천 사진',        val:parsed.best_photo },
-    { cls:'stag-orange', label:'핵심 텍스트',       val:parsed.title_text + (parsed.subtitle_text ? '\n서브: ' + parsed.subtitle_text : '') },
+    { cls:'stag-orange', label:'핵심 텍스트',       val:parsed.title_text + (parsed.subtitle_text ? '\n서브: '+parsed.subtitle_text : '') },
     { cls:'stag-blue',   label:'레이아웃',          val:parsed.layout },
     { cls:'stag-green',  label:'색상 전략',         val:parsed.color_scheme },
     { cls:'stag-purple', label:'클릭률 포인트',     val:parsed.hook_element },
     { cls:'stag-blue',   label:'Canva 제작 가이드', val:parsed.canva_prompt }
   ].filter(function(i) { return i.val; });
   document.getElementById('strategy-grid').innerHTML = items.map(function(i) {
-    return '<div class="strategy-item"><span class="stag ' + i.cls + '">' + i.label + '</span><div class="scontent">' + i.val.replace(/\n/g,'<br>') + '</div></div>';
+    return '<div class="strategy-item"><span class="stag '+i.cls+'">'+i.label+'</span><div class="scontent">'+i.val.replace(/\n/g,'<br>')+'</div></div>';
   }).join('');
   showResult();
 }
@@ -469,30 +480,29 @@ function showResult() {
 }
 
 document.getElementById('edit-send-btn').addEventListener('click', function() { doEdit(); });
-document.getElementById('edit-input').addEventListener('keydown', function(e) { if (e.key === 'Enter') doEdit(); });
+document.getElementById('edit-input').addEventListener('keydown', function(e) { if(e.key==='Enter') doEdit(); });
 
 function doEdit() {
   var txt = document.getElementById('edit-input').value.trim();
   if (!txt || isLoading) return;
-  var apiKey = document.getElementById('api-key').value.trim();
-  if (!apiKey) { setStatus('❌ API 키를 입력해주세요', 'error'); return; }
+  var keys = getKeys();
+  if (!keys.openai) { setStatus('❌ API 키를 입력해주세요', 'error'); return; }
   document.getElementById('edit-input').value = '';
   isLoading = true;
   setStatus('수정 중...', 'loading');
-  conversationHistory.push({ role:'user', content:'다음 요청으로 수정해주세요: ' + txt + '\n같은 JSON 형식으로만 응답.' });
+  conversationHistory.push({ role:'user', content:'다음 요청으로 수정해주세요: '+txt+'\n같은 JSON 형식으로만 응답.' });
   fetch('https://api.openai.com/v1/chat/completions', {
     method:'POST',
-    headers:{ 'Content-Type':'application/json', 'Authorization':'Bearer ' + apiKey },
-    body:JSON.stringify({ model:'gpt-4o', max_tokens:1000, messages:[{ role:'system', content:buildSystem() }].concat(conversationHistory) })
+    headers:{ 'Content-Type':'application/json', 'Authorization':'Bearer '+keys.openai },
+    body: JSON.stringify({ model:'gpt-4o', max_tokens:1000, messages:[{ role:'system', content:buildSystem() }].concat(conversationHistory) })
   })
   .then(function(r) { return r.json(); })
   .then(function(d) {
     var text = d.choices[0].message.content;
     conversationHistory.push({ role:'assistant', content:text });
-    renderResult(text);
-    setStatus('✅ 수정 완료!', 'success');
+    renderResult(text); setStatus('✅ 수정 완료!','success');
   })
-  .catch(function(err) { setStatus('❌ 오류: ' + (err.message || String(err)), 'error'); })
+  .catch(function(err) { setStatus('❌ 오류: '+(err.message||String(err)),'error'); })
   .finally(function() { isLoading = false; });
 }
 
@@ -503,9 +513,9 @@ document.getElementById('canva-open-btn').addEventListener('click', function() {
   if (canvaPrompt && navigator.clipboard) {
     navigator.clipboard.writeText(canvaPrompt).then(function() {
       alert('📋 Canva 가이드 복사됨!\nCanva에서 붙여넣기해서 참고하세요.');
-      window.open(url, '_blank');
-    }).catch(function() { window.open(url, '_blank'); });
-  } else { window.open(url, '_blank'); }
+      window.open(url,'_blank');
+    }).catch(function() { window.open(url,'_blank'); });
+  } else { window.open(url,'_blank'); }
 });
 </script>
 </body>
